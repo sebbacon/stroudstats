@@ -37,6 +37,8 @@ except FileNotFoundError:
     # Save it
     df.to_csv('all_crime.csv')
 
+df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
+
 # +
 import matplotlib.pyplot as plt
 # %matplotlib inline
@@ -46,16 +48,27 @@ grouped = df.groupby(['category', 'date']).agg('count').reset_index(level=0).piv
     index='date', columns='category', values='location')
 
 # Restrict to categories with more data
-grouped = grouped[["Anti-social behaviour", "Burglary", "Criminal damage and arson", "Other theft", "Public order", "Shoplifting", "Vehicle crime", "Violence and sexual offences"]]
+top_categories = ["Anti-social behaviour", "Burglary", "Criminal damage and arson", 
+                  "Other theft", "Public order", "Shoplifting", "Vehicle crime", "Violence and sexual offences"]
 
 # Normalise to maximum as baseline
 df2 = pd.DataFrame()
 for col in grouped.columns:
     df2[col] = grouped[col]/grouped[col].max()
 
-# Plot it!
+# Plot them
 from matplotlib.pyplot import figure
 figure(num=None, figsize=(18, 16), dpi=80, facecolor='w', edgecolor='k')
 
 plt.rcParams["figure.figsize"] = (20,10)
-df2.rolling(3).mean().plot()
+grouped.rolling(3).mean().plot.area(legend='reverse')
+plt.suptitle("All crime")
+
+ax = df2[top_categories].rolling(3).mean().plot(legend='reverse')
+plt.suptitle("Most common crimes, normalised to same scale")
+
+# -
+
+
+
+df2.head()
