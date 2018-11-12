@@ -3,3 +3,6 @@ pandas
 matplotlib
 jupytext
 ipykernel
+rtree
+geopandas
+dateutils
